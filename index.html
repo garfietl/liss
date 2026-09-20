@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ramo Corazón de Flores Amarillas</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --yellow-light: #fff8bc;
+      --yellow-mid: #ffd700;
+      --yellow-dark: #f59e0b;
+      --brown: #3f1d0b;
+      --wrap-paper: #fbcfe8;
+      --wrap-shadow: #f472b6;
+      --ribbon: #ec4899;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+      overflow-y: auto;
+      color: #fff;
+    }
+
+    #particles-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .app-container {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    /* Ramo Contenedor Principal */
+    .bouquet-stage {
+      position: relative;
+      width: 380px;
+      height: 520px;
+      margin-bottom: 20px;
+    }
+
+    /* Capas del Envoltorio */
+    .wrap-back-paper {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 260px;
+      height: 270px;
+      background: linear-gradient(135deg, var(--wrap-paper) 0%, var(--wrap-shadow) 100%);
+      clip-path: polygon(10% 0%, 90% 0%, 65% 100%, 35% 100%);
+      z-index: 2;
+      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4));
+    }
+
+    .wrap-front-left {
+      position: absolute;
+      bottom: 20px;
+      left: 70px;
+      width: 125px;
+      height: 210px;
+      background: linear-gradient(160deg, #fce7f3 0%, var(--wrap-shadow) 100%);
+      clip-path: polygon(0 0, 100% 25%, 50% 100%, 0 80%);
+      z-index: 12;
+      opacity: 0.95;
+    }
+
+    .wrap-front-right {
+      position: absolute;
+      bottom: 20px;
+      right: 70px;
+      width: 125px;
+      height: 210px;
+      background: linear-gradient(-160deg, #fce7f3 0%, var(--wrap-shadow) 100%);
+      clip-path: polygon(0 25%, 100% 0, 100% 80%, 50% 100%);
+      z-index: 12;
+      opacity: 0.95;
+    }
+
+    .ribbon {
+      position: absolute;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 15;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .ribbon-center {
+      width: 24px;
+      height: 24px;
+      background-color: var(--ribbon);
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      z-index: 2;
+    }
+
+    .ribbon-loop-left, .ribbon-loop-right {
+      width: 38px;
+      height: 26px;
+      background-color: var(--ribbon);
+      border-radius: 50% 50% 10% 50%;
+    }
+
+    .ribbon-loop-left {
+      transform: rotate(-20deg) translateX(6px);
+    }
+
+    .ribbon-loop-right {
+      transform: rotate(20deg) scaleX(-1) translateX(6px);
+    }
+
+    /* Tallos y Flores */
+    .stems-container {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+    }
+
+    .stem-line {
+      position: absolute;
+      bottom: 50px;
+      left: 50%;
+      width: 3.5px;
+      background: linear-gradient(to top, #14532d, #22c55e);
+      border-radius: 2px;
+      transform-origin: bottom center;
+    }
+
+    .flowers-container {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 5;
+    }
+
+    /* Estructura de cada flor */
+    .flower-item {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      margin-left: -20px;
+      margin-top: -20px;
+      cursor: pointer;
+      transform-origin: center center;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.27);
+    }
+
+    .flower-item:hover {
+      transform: scale(1.45) !important;
+      z-index: 200 !important;
+    }
+
+    .flower-center-core {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 11px;
+      height: 11px;
+      background: radial-gradient(circle, #78350f 0%, var(--brown) 100%);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 4;
+      box-shadow: 0 0 2px rgba(0,0,0,0.5);
+    }
+
+    .flower-petal {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 10px;
+      height: 20px;
+      background: linear-gradient(to top, var(--yellow-dark), var(--yellow-mid) 70%, var(--yellow-light));
+      border-radius: 50% 50% 20% 20%;
+      transform-origin: bottom center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+    }
+
+    /* Texto "Te Amo" libre de flores en el centro */
+    .center-text {
+      position: absolute;
+      top: 170px;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 30;
+      font-size: 2.5rem;
+      font-weight: 800;
+      font-family: 'Georgia', serif;
+      color: #fff200;
+      text-shadow: 
+        0 0 12px rgba(255, 242, 0, 0.9),
+        0 0 22px rgba(245, 158, 11, 0.9),
+        2px 2px 6px rgba(0,0,0,0.9);
+      pointer-events: none;
+      white-space: nowrap;
+      animation: pulseText 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulseText {
+      0% { transform: translate(-50%, -50%) scale(1); }
+      100% { transform: translate(-50%, -50%) scale(1.08); }
+    }
+
+    /* Tarjeta del Mensaje */
+    .card-message {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 20px;
+      padding: 22px 30px;
+      text-align: center;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.45);
+      max-width: 400px;
+      width: 90%;
+      animation: floatCard 4s ease-in-out infinite alternate;
+    }
+
+    .card-message h2 {
+      color: #fef08a;
+      font-size: 1.45rem;
+      margin-bottom: 8px;
+      font-weight: 600;
+      text-shadow: 0 0 10px rgba(250, 204, 21, 0.4);
+    }
+
+    .card-message p {
+      color: #f1f5f9;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      font-style: italic;
+    }
+
+    @keyframes floatCard {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-8px); }
+    }
+
+    .spawn-anim {
+      animation: spawnBloom 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards;
+    }
+
+    @keyframes spawnBloom {
+      0% { opacity: 0; transform: scale(0); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="particles-bg"></canvas>
+
+  <div class="app-container">
+    <div class="bouquet-stage" id="bouquet-stage">
+      <div class="wrap-back-paper"></div>
+      <div class="stems-container" id="stems-container"></div>
+      <div class="flowers-container" id="flowers-container"></div>
+      
+      <!-- Frase destacada en el centro del corazón -->
+      <div class="center-text">Te Amo</div>
+
+      <div class="wrap-front-left"></div>
+      <div class="wrap-front-right"></div>
+      
+      <div class="ribbon">
+        <div class="ribbon-loop-left"></div>
+        <div class="ribbon-center"></div>
+        <div class="ribbon-loop-right"></div>
+      </div>
+    </div>
+
+    <div class="card-message">
+      <h2>✨ Un Corazón Para Ti ✨</h2>
+      <p>"Hay personas que iluminan la vida sin hacer ruido, simplemente existiendo y siendo exactamente quienes son. 
+         Para mí, tú eres esa luz: un lugar seguro, una alegría constante y una de las razones más bonitas que tengo para sonreír. 
+        Gracias por tu esencia, por cada momento compartido y por la tranquilidad que me da saber que estás en mi vida. Te amo infinitamente."</p>
+    </div>
+  </div>
+
+  <script>
+    const TOTAL_FLOWERS = 50;
+    const flowersContainer = document.getElementById('flowers-container');
+    const stemsContainer = document.getElementById('stems-container');
+
+    const originX = 190;
+    const originY = 450;
+    const heartCenterX = 190;
+    const heartCenterY = 170;
+
+    // Obtener puntos matemáticos del corazón
+    function getHeartPoint(t, scale) {
+      const x = 16 * Math.pow(Math.sin(t), 3);
+      const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+      return {
+        x: heartCenterX + x * scale,
+        y: heartCenterY + y * scale
+      };
+    }
+
+    const points = [];
+
+    // Distribución en dos anillos concéntricos externos (dejando el centro 100% libre)
+    for (let i = 0; i < TOTAL_FLOWERS; i++) {
+      const t = (i / TOTAL_FLOWERS) * Math.PI * 2;
+      // Alterna entre la capa exterior e intermedia para dar densidad al borde del corazón
+      const scale = (i % 2 === 0) ? 9.2 : 7.6;
+      points.push(getHeartPoint(t, scale));
+    }
+
+    // Renderizar las 50 flores únicamente en el perímetro
+    points.forEach((pt, index) => {
+      // Dibujar Tallo
+      const deltaX = pt.x - originX;
+      const deltaY = originY - pt.y;
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      const stemAngle = Math.atan2(deltaX, deltaY) * (180 / Math.PI);
+
+      const stem = document.createElement('div');
+      stem.className = 'stem-line';
+      stem.style.height = `${distance}px`;
+      stem.style.transform = `rotate(${stemAngle}deg)`;
+      stemsContainer.appendChild(stem);
+
+      // Dibujar Flor
+      const flower = document.createElement('div');
+      flower.className = 'flower-item spawn-anim';
+      flower.style.left = `${pt.x}px`;
+      flower.style.top = `${pt.y}px`;
+      flower.style.zIndex = Math.floor(pt.y);
+      flower.style.animationDelay = `${index * 0.02}s`;
+
+      const center = document.createElement('div');
+      center.className = 'flower-center-core';
+      flower.appendChild(center);
+
+      // Pétalos por flor
+      const petalCount = 10;
+      for (let p = 0; p < petalCount; p++) {
+        const petal = document.createElement('div');
+        petal.className = 'flower-petal';
+        const pAngle = (360 / petalCount) * p;
+        petal.style.transform = `translate(-50%, -100%) rotate(${pAngle}deg)`;
+        flower.appendChild(petal);
+      }
+
+      // Interacción al hacer clic
+      flower.addEventListener('click', () => {
+        flower.style.transition = 'transform 0.1s ease';
+        flower.style.transform = 'scale(1.7) rotate(180deg)';
+        setTimeout(() => {
+          flower.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.27)';
+          flower.style.transform = 'scale(1)';
+        }, 300);
+      });
+
+      flowersContainer.appendChild(flower);
+    });
+
+    // Fondo con partículas flotantes
+    const canvas = document.getElementById('particles-bg');
+    const ctx = canvas.getContext('2d');
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    const particles = [];
+    for (let i = 0; i < 65; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 2 + 0.5,
+        a: Math.random(),
+        s: Math.random() * 0.4 + 0.1
+      });
+    }
+
+    function renderParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.y -= p.s;
+        if (p.y < 0) p.y = canvas.height;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(254, 240, 138, ${p.a})`;
+        ctx.fill();
+      });
+      requestAnimationFrame(renderParticles);
+    }
+    renderParticles();
+  </script>
+</body>
+</html>
